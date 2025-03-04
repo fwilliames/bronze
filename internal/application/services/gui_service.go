@@ -1,9 +1,14 @@
 package services
 
 import (
+	colors "bronze/internal/config/colors"
 	"fmt"
+	"image/color"
 
 	"fyne.io/fyne/v2"
+	"fyne.io/fyne/v2/canvas"
+	"fyne.io/fyne/v2/container"
+	"fyne.io/fyne/v2/theme"
 	"fyne.io/fyne/v2/widget"
 )
 
@@ -19,10 +24,11 @@ func NewGUIService(userService *UserService) *GUIService {
 
 // RefreshUserList atualiza a lista de usuários na interface gráfica
 func (g *GUIService) RefreshUserList(listContainer *fyne.Container) {
-	// Limpa a lista antes de atualizar
+
 	listContainer.Objects = nil
 
-	// Obtém a lista de usuários
+	productGrid := createListToShow()
+
 	products, err := g.UserService.GetProducts()
 	if err != nil {
 		listContainer.Add(widget.NewLabel("Erro ao carregar Produtos"))
@@ -30,11 +36,41 @@ func (g *GUIService) RefreshUserList(listContainer *fyne.Container) {
 		return
 	}
 
-	// Adiciona os usuários à lista
 	for _, product := range products {
-		listContainer.Add(widget.NewLabel(fmt.Sprintf("Produto: %s Valor: %.2f", product.Name, product.Value)))
+		productGrid.Add(createLabel(product.Name))
+		productGrid.Add(createLabel(fmt.Sprintf("%.2f", product.Value)))
+
 	}
 
-	// Atualiza a exibição
+	listContainer.Add(productGrid)
 	listContainer.Refresh()
+}
+
+func createListToShow() *fyne.Container {
+
+	background := canvas.NewRectangle(color.RGBA(colors.LavandaEscuro))
+
+	header1 := canvas.NewText("Nome", theme.ForegroundColor())
+	header1.TextStyle.Bold = true
+	header1.Color = colors.LavandaClaro
+
+	header2 := canvas.NewText("Preço", theme.ForegroundColor())
+	header2.TextStyle.Bold = true
+	header2.Color = colors.LavandaClaro
+
+	productGrid := container.NewGridWithColumns(2)
+	productGrid.Add(container.NewStack(background, header1))
+	productGrid.Add(container.NewStack(background, header2))
+
+	return productGrid
+
+}
+
+func createLabel(labelText string) *fyne.Container {
+	background := canvas.NewRectangle(colors.LavandaClaro)
+
+	Label := canvas.NewText(labelText, theme.ForegroundColor())
+	Label.Color = colors.RoxoSuave
+
+	return container.NewStack(background, Label)
 }
