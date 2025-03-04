@@ -14,7 +14,6 @@ func main() {
 		log.Println("Erro ao iniciar banco:", err) // Apenas um log, sem travar
 		return
 	}
-	//////////////////////
 
 	// Inicializa o serviço de usuários
 	userService := services.NewUserService(repo)
