@@ -14,9 +14,9 @@ import (
 func getDBPath() string {
 	if runtime.GOOS == "windows" {
 		appData := os.Getenv("APPDATA")
-		return appData + "\\CadastroUsuarios\\users.db"
+		return appData + "\\GuiaSuperMarket\\products.db"
 	} else {
-		return "./temp/users.db"
+		return "./temp/products.db"
 	}
 }
 
@@ -31,7 +31,7 @@ func NewSQLiteRepository() (usecases.UserRepository, error) {
 
 	// Cria o diretório caso não exista
 	if runtime.GOOS == "windows" {
-		os.MkdirAll(os.Getenv("APPDATA")+"\\CadastroUsuarios", os.ModePerm)
+		os.MkdirAll(os.Getenv("APPDATA")+"\\GuiaSuperMarket", os.ModePerm)
 	}
 
 	db, err := sql.Open("sqlite3", dbPath)
@@ -39,7 +39,7 @@ func NewSQLiteRepository() (usecases.UserRepository, error) {
 		return nil, err
 	}
 
-	_, err = db.Exec("CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY, name TEXT, age INTEGER)")
+	_, err = db.Exec("CREATE TABLE IF NOT EXISTS products (id INTEGER PRIMARY KEY, name TEXT, value FLOAT)")
 	if err != nil {
 		return nil, err
 	}
@@ -48,31 +48,31 @@ func NewSQLiteRepository() (usecases.UserRepository, error) {
 }
 
 // SaveUser insere um usuário no banco
-func (r *SQLiteRepository) SaveUser(name string, age int) error {
-	_, err := r.db.Exec("INSERT INTO users (name, age) VALUES (?, ?)", name, age)
+func (r *SQLiteRepository) SaveProduct(name string, value float64) error {
+	_, err := r.db.Exec("INSERT INTO products (name, value) VALUES (?, ?)", name, value)
 	return err
 }
 
 // GetAllUsers retorna todos os usuários cadastrados no banco
-func (r *SQLiteRepository) GetAllUsers() ([]domain.User, error) {
-	rows, err := r.db.Query("SELECT id, name, age FROM users")
+func (r *SQLiteRepository) GetAllProducts() ([]domain.Product, error) {
+	rows, err := r.db.Query("SELECT id, name, value FROM products")
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
 
-	var users []domain.User
+	var products []domain.Product
 	for rows.Next() {
-		var user domain.User
-		if err := rows.Scan(&user.ID, &user.Name, &user.Age); err != nil {
+		var product domain.Product
+		if err := rows.Scan(&product.ID, &product.Name, &product.Value); err != nil {
 			return nil, err
 		}
-		users = append(users, user)
+		products = append(products, product)
 	}
 
 	if err := rows.Err(); err != nil {
 		return nil, err
 	}
 
-	return users, nil
+	return products, nil
 }

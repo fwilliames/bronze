@@ -8,18 +8,18 @@ import (
 	"fyne.io/fyne/v2/widget"
 )
 
-func NewMainWindow(userService *services.UserService, w fyne.Window) fyne.CanvasObject {
+func NewMainWindow(guiService *services.GUIService, w fyne.Window) fyne.CanvasObject {
 	// Botões principais
 	insertButton := widget.NewButton("Inserir Produto", func() {
-		w.SetContent(NewCadastroForm(userService, w))
+		w.SetContent(NewCadastroForm(guiService, w))
 	})
 
 	listButton := widget.NewButton("Lista de Produtos", func() {
-		w.SetContent(NewUserList(userService, w))
+		w.SetContent(NewUserList(guiService, w))
 	})
 
 	reportButton := widget.NewButton("Gerar Relatorio", func() {
-		w.SetContent(NewUserList(userService, w))
+		w.SetContent(NewUserList(guiService, w))
 	})
 
 	// Retorna o conteúdo da tela principal

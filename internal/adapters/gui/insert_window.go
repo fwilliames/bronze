@@ -10,7 +10,7 @@ import (
 )
 
 // NewCadastroForm retorna o conteúdo da tela de cadastro
-func NewCadastroForm(userService *services.UserService, w fyne.Window) fyne.CanvasObject {
+func NewCadastroForm(guiService *services.GUIService, w fyne.Window) fyne.CanvasObject {
 
 	listContainer := container.NewVBox()
 
@@ -26,13 +26,13 @@ func NewCadastroForm(userService *services.UserService, w fyne.Window) fyne.Canv
 		name := nameEntry.Text
 		ageStr := ageEntry.Text
 
-		age, err := strconv.Atoi(ageStr)
+		age, err := strconv.ParseFloat(ageStr, 64)
 		if err != nil {
 			statusLabel.SetText("Valor invalido!")
 			return
 		}
 
-		err = userService.SaveUser(name, age)
+		err = guiService.UserService.SaveUser(name, age)
 		if err != nil {
 			statusLabel.SetText("Erro ao Inserir!")
 			return
@@ -42,19 +42,18 @@ func NewCadastroForm(userService *services.UserService, w fyne.Window) fyne.Canv
 		nameEntry.SetText("")
 		ageEntry.SetText("")
 
-		RefreshUserList(userService, listContainer)
+		guiService.RefreshUserList(guiService.UserService, listContainer)
 	})
 
 	listButton := widget.NewButton("Lista de Produtos", func() {
-		w.SetContent(NewUserList(userService, w))
+		w.SetContent(NewUserList(guiService, w))
 	})
 
 	// Voltar para a tela principal
 	reportButton := widget.NewButton("Gerar Relatorio", func() {
-		w.SetContent(NewUserList(userService, w))
 	})
 
-	RefreshUserList(userService, listContainer)
+	guiService.RefreshUserList(guiService.UserService, listContainer)
 
 	// Retorna o conteúdo da tela de cadastro
 	return container.NewVBox(
