@@ -21,8 +21,13 @@ func CreateListButton(g *services.GUIService, w fyne.Window) fyne.CanvasObject {
 }
 
 func CreateReportButton(g *services.GUIService, w fyne.Window) fyne.CanvasObject {
+	statusLabel := widget.NewLabel("")
 	return widget.NewButton("Gerar Relatorio", func() {
-		//TODO: Função para Gerar PDF com a lista dos Produtos
+		err := g.UserService.GenerateReport()
+		if err != nil {
+			statusLabel.SetText(err.Error())
+			return
+		}
 	})
 }
 
