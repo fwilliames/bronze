@@ -9,21 +9,23 @@ import (
 )
 
 func NewMainWindow(userService *services.UserService, w fyne.Window) fyne.CanvasObject {
-	projectLabel := widget.NewLabel("Cadastro de Usuários")
-
 	// Botões principais
-	cadastroButton := widget.NewButton("Tela de Cadastro", func() {
+	insertButton := widget.NewButton("Inserir Produto", func() {
 		w.SetContent(NewCadastroForm(userService, w))
 	})
 
-	listButton := widget.NewButton("Tela de Listagem", func() {
+	listButton := widget.NewButton("Lista de Produtos", func() {
+		w.SetContent(NewUserList(userService, w))
+	})
+
+	reportButton := widget.NewButton("Gerar Relatorio", func() {
 		w.SetContent(NewUserList(userService, w))
 	})
 
 	// Retorna o conteúdo da tela principal
 	return container.NewVBox(
-		projectLabel,
-		cadastroButton,
+		insertButton,
 		listButton,
+		reportButton,
 	)
 }

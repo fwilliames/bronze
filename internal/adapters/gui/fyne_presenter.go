@@ -9,8 +9,8 @@ import (
 
 func StartApp(userService *services.UserService) {
 	a := app.New()
-	w := a.NewWindow("Cadastro de Usuários")
-	w.Resize(fyne.NewSize(300, 200))
+	w := a.NewWindow("Guia de Supermercado")
+	w.Resize(fyne.NewSize(856, 960))
 
 	// Exibe os componentes principais (formulário de cadastro e botões)
 	w.SetContent(NewMainWindow(userService, w))
