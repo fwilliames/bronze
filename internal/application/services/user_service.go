@@ -16,12 +16,12 @@ func NewUserService(repo usecases.UserRepository) *UserService {
 }
 
 // SaveUser salva um usuário no banco
-func (s *UserService) SaveUser(name string, value float64) error {
+func (s *UserService) SaveProduct(name string, value float64) error {
 	return s.repo.SaveProduct(name, value)
 }
 
 // GetUsers retorna a lista de usuários cadastrados
-func (s *UserService) GetUsers() ([]domain.Product, error) {
+func (s *UserService) GetProducts() ([]domain.Product, error) {
 	users, err := s.repo.GetAllProducts() // Este método deve ser implementado no seu repositório
 	if err != nil {
 		return nil, err

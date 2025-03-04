@@ -18,21 +18,21 @@ func NewGUIService(userService *UserService) *GUIService {
 }
 
 // RefreshUserList atualiza a lista de usuários na interface gráfica
-func (g *GUIService) RefreshUserList(userService *UserService, listContainer *fyne.Container) {
+func (g *GUIService) RefreshUserList(listContainer *fyne.Container) {
 	// Limpa a lista antes de atualizar
 	listContainer.Objects = nil
 
 	// Obtém a lista de usuários
-	users, err := userService.GetUsers()
+	products, err := g.UserService.GetProducts()
 	if err != nil {
-		listContainer.Add(widget.NewLabel("Erro ao carregar usuários"))
+		listContainer.Add(widget.NewLabel("Erro ao carregar Produtos"))
 		listContainer.Refresh() // Atualiza a exibição
 		return
 	}
 
 	// Adiciona os usuários à lista
-	for _, user := range users {
-		listContainer.Add(widget.NewLabel(fmt.Sprintf("Produto: %s Valor: %.2f", user.Name, user.Value)))
+	for _, product := range products {
+		listContainer.Add(widget.NewLabel(fmt.Sprintf("Produto: %s Valor: %.2f", product.Name, product.Value)))
 	}
 
 	// Atualiza a exibição
