@@ -4,14 +4,19 @@ import (
 	"bronze/internal/application/usecases"
 	"database/sql"
 	"os"
+	"runtime"
 
 	_ "github.com/mattn/go-sqlite3"
 )
 
 // Retorna o caminho do banco no APPDATA
 func getDBPath() string {
-	appData := os.Getenv("APPDATA")
-	return appData + "\\CadastroUsuarios\\users.db"
+	if runtime.GOOS == "windows" {
+		appData := os.Getenv("APPDATA")
+		return appData + "\\CadastroUsuarios\\users.db"
+	} else {
+		return "./temp/users.db"
+	}
 }
 
 type SQLiteRepository struct {
@@ -24,7 +29,9 @@ func NewSQLiteRepository() (usecases.UserRepository, error) {
 	dbPath := getDBPath()
 
 	// Cria o diretório caso não exista
-	os.MkdirAll(os.Getenv("APPDATA")+"\\CadastroUsuarios", os.ModePerm)
+	if runtime.GOOS == "windows" {
+		os.MkdirAll(os.Getenv("APPDATA")+"\\CadastroUsuarios", os.ModePerm)
+	}
 
 	db, err := sql.Open("sqlite3", dbPath)
 	if err != nil {
