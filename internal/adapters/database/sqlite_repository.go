@@ -2,6 +2,7 @@ package database
 
 import (
 	"bronze/internal/application/usecases"
+	"bronze/internal/domain"
 	"database/sql"
 	"os"
 	"runtime"
@@ -50,4 +51,28 @@ func NewSQLiteRepository() (usecases.UserRepository, error) {
 func (r *SQLiteRepository) SaveUser(name string, age int) error {
 	_, err := r.db.Exec("INSERT INTO users (name, age) VALUES (?, ?)", name, age)
 	return err
+}
+
+// GetAllUsers retorna todos os usuários cadastrados no banco
+func (r *SQLiteRepository) GetAllUsers() ([]domain.User, error) {
+	rows, err := r.db.Query("SELECT id, name, age FROM users")
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var users []domain.User
+	for rows.Next() {
+		var user domain.User
+		if err := rows.Scan(&user.ID, &user.Name, &user.Age); err != nil {
+			return nil, err
+		}
+		users = append(users, user)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return users, nil
 }
