@@ -14,11 +14,12 @@ func main() {
 		log.Println("Erro ao iniciar banco:", err) // Apenas um log, sem travar
 		return
 	}
-	//////////////////////
 
 	// Inicializa o serviço de usuários
 	userService := services.NewUserService(repo)
 
+	guiService := services.NewGUIService(userService)
+
 	// Inicializa a interface gráfica
-	gui.StartApp(userService)
+	gui.StartApp(guiService)
 }

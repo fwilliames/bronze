@@ -24,6 +24,15 @@ setup:
 # Regra para compilar o binário e gerar o instalador
 release: build setup
 
+# Build para Linux
+gobuild:
+	go build cmd/main.go
+	go run cmd/main.go
+
+goclean:
+	rm -rf \CadastroUsuarios
+	rm -r \CadastroUsuarios\users.db
+
 # Regra para limpar os arquivos gerados
 clean:
 	rm -rf $(BUILD_DIR)/$(BINARY_NAME)
