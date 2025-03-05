@@ -66,11 +66,11 @@ func CreateSaveButton(g *services.GUIService, w fyne.Window, productsList *fyne.
 		nameEntry.SetText("")
 		valueEntry.SetText("")
 
-		g.RefreshUserList(productsList)
+		g.ListProductsByFilter(productsList, data)
 	}), nameEntry, valueEntry, dataEntry, statusLabel
 }
 
-func CreateDataSelectFilter(g *services.GUIService, w fyne.Window) *widget.Select {
+func CreateDataSelectFilter(g *services.GUIService, w fyne.Window, productsList *fyne.Container) *widget.Select {
 	dates, err := g.UserService.GetUniqueDates()
 	if err != nil {
 		log.Println("Erro ao recuperar datas:", err)
@@ -78,7 +78,7 @@ func CreateDataSelectFilter(g *services.GUIService, w fyne.Window) *widget.Selec
 	}
 
 	selectWidget := widget.NewSelect(dates, func(selected string) {
-		log.Println("Data selecionada:", selected)
+		g.ListProductsByFilter(productsList, selected)
 	})
 
 	selectWidget.PlaceHolder = "Selecione uma data"
