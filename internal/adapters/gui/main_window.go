@@ -9,13 +9,13 @@ import (
 
 func NewMainWindow(guiService *services.GUIService, w fyne.Window) fyne.CanvasObject {
 
-	insertButton := CreateInsertButton(guiService, w)
-	listButton := CreateListButton(guiService, w)
-	reportButton := CreateReportButton(guiService, w)
+	buttonToInsertWindow := CreateButtonToInsertWindow(guiService, w)
+	buttonToListWindow := CreateButtonToListWindow(guiService, w)
+	buttonToReportWindow := CreateButtonToReportWindow(guiService, w)
 
 	return container.NewVBox(
-		insertButton,
-		listButton,
-		reportButton,
+		buttonToInsertWindow,
+		buttonToListWindow,
+		buttonToReportWindow,
 	)
 }

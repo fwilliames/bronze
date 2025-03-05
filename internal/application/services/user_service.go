@@ -41,9 +41,11 @@ func (s *UserService) GetProductsByFilter(filter string) ([]domain.Product, erro
 	return users, nil
 }
 
-func (s *UserService) GenerateReport() error {
+func (s *UserService) GenerateReport(filter string) error {
 	println("Generate Report")
-	products, err := s.GetProducts()
+	println(filter)
+
+	products, err := s.GetProductsByFilter(filter)
 	if err != nil {
 		return err
 	}
