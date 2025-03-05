@@ -80,3 +80,7 @@ func (s *UserService) GenerateReport() error {
 
 	return nil
 }
+
+func (s *UserService) GetUniqueDates() ([]string, error) {
+	return s.repo.GetUniqueDates()
+}
