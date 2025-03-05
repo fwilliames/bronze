@@ -9,22 +9,28 @@ import (
 	"fyne.io/fyne/v2/widget"
 )
 
-func CreateInsertButton(g *services.GUIService, w fyne.Window) fyne.CanvasObject {
+func CreateButtonToInsertWindow(g *services.GUIService, w fyne.Window) fyne.CanvasObject {
 	return widget.NewButton("Inserir Produto", func() {
 		w.SetContent(NewInsertWindow(g, w))
 	})
 }
 
-func CreateListButton(g *services.GUIService, w fyne.Window) fyne.CanvasObject {
+func CreateButtonToListWindow(g *services.GUIService, w fyne.Window) fyne.CanvasObject {
 	return widget.NewButton("Lista de Produtos", func() {
 		w.SetContent(NewListWindow(g, w))
+	})
+}
+
+func CreateButtonToReportWindow(g *services.GUIService, w fyne.Window) fyne.CanvasObject {
+	return widget.NewButton("Relatorios", func() {
+		w.SetContent(NewReportWindow(g, w))
 	})
 }
 
 func CreateReportButton(g *services.GUIService, w fyne.Window) fyne.CanvasObject {
 	statusLabel := widget.NewLabel("")
 	return widget.NewButton("Gerar Relatorio", func() {
-		err := g.UserService.GenerateReport()
+		err := g.UserService.GenerateReport(g.Filter.Data)
 		if err != nil {
 			statusLabel.SetText(err.Error())
 			return
@@ -82,6 +88,30 @@ func CreateDataSelectFilter(g *services.GUIService, w fyne.Window, productsList 
 	})
 
 	selectWidget.PlaceHolder = "Selecione uma data"
+
+	return selectWidget
+}
+
+func CreateSelectFilter(g *services.GUIService, w fyne.Window, field string) *widget.Select {
+
+	var items []string
+
+	switch field {
+
+	case "data":
+		datas, err := g.UserService.GetUniqueDates()
+		if err != nil {
+			log.Println("Erro ao recuperar datas:", err)
+			datas = []string{"Nenhuma data encontrada"}
+		}
+		items = datas
+	}
+
+	selectWidget := widget.NewSelect(items, func(selected string) {
+		g.Filter.Data = selected
+	})
+
+	selectWidget.PlaceHolder = "Selecione um item"
 
 	return selectWidget
 }
