@@ -39,7 +39,7 @@ func NewSQLiteRepository() (usecases.UserRepository, error) {
 		return nil, err
 	}
 
-	_, err = db.Exec("CREATE TABLE IF NOT EXISTS products (id INTEGER PRIMARY KEY, name TEXT, value FLOAT)")
+	_, err = db.Exec("CREATE TABLE IF NOT EXISTS products (id INTEGER PRIMARY KEY, name TEXT, data TEXT, value FLOAT)")
 	if err != nil {
 		return nil, err
 	}
@@ -48,14 +48,14 @@ func NewSQLiteRepository() (usecases.UserRepository, error) {
 }
 
 // SaveUser insere um usuário no banco
-func (r *SQLiteRepository) SaveProduct(name string, value float64) error {
-	_, err := r.db.Exec("INSERT INTO products (name, value) VALUES (?, ?)", name, value)
+func (r *SQLiteRepository) SaveProduct(name, data string, value float64) error {
+	_, err := r.db.Exec("INSERT INTO products (name, data, value) VALUES (?, ?, ?)", name, data, value)
 	return err
 }
 
 // GetAllUsers retorna todos os usuários cadastrados no banco
 func (r *SQLiteRepository) GetAllProducts() ([]domain.Product, error) {
-	rows, err := r.db.Query("SELECT id, name, value FROM products")
+	rows, err := r.db.Query("SELECT id, name, data, value FROM products")
 	if err != nil {
 		return nil, err
 	}
@@ -64,7 +64,7 @@ func (r *SQLiteRepository) GetAllProducts() ([]domain.Product, error) {
 	var products []domain.Product
 	for rows.Next() {
 		var product domain.Product
-		if err := rows.Scan(&product.ID, &product.Name, &product.Value); err != nil {
+		if err := rows.Scan(&product.ID, &product.Name, &product.Data, &product.Value); err != nil {
 			return nil, err
 		}
 		products = append(products, product)
