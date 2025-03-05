@@ -33,6 +33,14 @@ func (s *UserService) GetProducts() ([]domain.Product, error) {
 	return users, nil
 }
 
+func (s *UserService) GetProductsByFilter(filter string) ([]domain.Product, error) {
+	users, err := s.repo.GetAllProductsbyFilter(filter) // Este método deve ser implementado no seu repositório
+	if err != nil {
+		return nil, err
+	}
+	return users, nil
+}
+
 func (s *UserService) GenerateReport() error {
 	println("Generate Report")
 	products, err := s.GetProducts()
@@ -79,4 +87,8 @@ func (s *UserService) GenerateReport() error {
 	}
 
 	return nil
+}
+
+func (s *UserService) GetUniqueDates() ([]string, error) {
+	return s.repo.GetUniqueDates()
 }

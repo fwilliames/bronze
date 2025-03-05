@@ -2,6 +2,7 @@ package gui
 
 import (
 	"bronze/internal/application/services"
+	"log"
 	"strconv"
 
 	"fyne.io/fyne/v2"
@@ -65,6 +66,22 @@ func CreateSaveButton(g *services.GUIService, w fyne.Window, productsList *fyne.
 		nameEntry.SetText("")
 		valueEntry.SetText("")
 
-		g.RefreshUserList(productsList)
+		g.ListProductsByFilter(productsList, data)
 	}), nameEntry, valueEntry, dataEntry, statusLabel
+}
+
+func CreateDataSelectFilter(g *services.GUIService, w fyne.Window, productsList *fyne.Container) *widget.Select {
+	dates, err := g.UserService.GetUniqueDates()
+	if err != nil {
+		log.Println("Erro ao recuperar datas:", err)
+		dates = []string{"Nenhuma data encontrada"}
+	}
+
+	selectWidget := widget.NewSelect(dates, func(selected string) {
+		g.ListProductsByFilter(productsList, selected)
+	})
+
+	selectWidget.PlaceHolder = "Selecione uma data"
+
+	return selectWidget
 }

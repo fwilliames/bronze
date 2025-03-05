@@ -12,10 +12,10 @@ func NewListWindow(g *services.GUIService, w fyne.Window) fyne.CanvasObject {
 	productsList := container.NewVBox()
 	insertButton := CreateInsertButton(g, w)
 	reportButton := CreateReportButton(g, w)
-
-	g.RefreshUserList(productsList)
+	dataSelectFilter := CreateDataSelectFilter(g, w, productsList)
 
 	return container.NewVBox(
+		dataSelectFilter,
 		productsList,
 		insertButton,
 		reportButton,

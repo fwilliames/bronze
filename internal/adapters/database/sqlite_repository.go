@@ -76,3 +76,46 @@ func (r *SQLiteRepository) GetAllProducts() ([]domain.Product, error) {
 
 	return products, nil
 }
+
+// GetAllUsers retorna todos os usuários cadastrados no banco
+func (r *SQLiteRepository) GetAllProductsbyFilter(filter string) ([]domain.Product, error) {
+	rows, err := r.db.Query("SELECT * FROM products WHERE data = ?", filter)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var products []domain.Product
+	for rows.Next() {
+		var product domain.Product
+		if err := rows.Scan(&product.ID, &product.Name, &product.Data, &product.Value); err != nil {
+			return nil, err
+		}
+		products = append(products, product)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return products, nil
+}
+
+func (r *SQLiteRepository) GetUniqueDates() ([]string, error) {
+	rows, err := r.db.Query("SELECT DISTINCT data FROM products ORDER BY data DESC")
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var datas []string
+	for rows.Next() {
+		var data string
+		if err := rows.Scan(&data); err != nil {
+			return nil, err
+		}
+		datas = append(datas, data)
+	}
+
+	return datas, nil
+}
