@@ -39,6 +39,7 @@ func (g *GUIService) RefreshUserList(listContainer *fyne.Container) {
 	for _, product := range products {
 		productGrid.Add(createLabel(product.Name))
 		productGrid.Add(createLabel(fmt.Sprintf("%.2f", product.Value)))
+		productGrid.Add(createLabel(product.Data))
 
 	}
 
@@ -58,9 +59,14 @@ func createListToShow() *fyne.Container {
 	header2.TextStyle.Bold = true
 	header2.Color = colors.LavandaClaro
 
-	productGrid := container.NewGridWithColumns(2)
+	header3 := canvas.NewText("Mes/Ano", theme.ForegroundColor())
+	header3.TextStyle.Bold = true
+	header3.Color = colors.LavandaClaro
+
+	productGrid := container.NewGridWithColumns(3)
 	productGrid.Add(container.NewStack(background, header1))
 	productGrid.Add(container.NewStack(background, header2))
+	productGrid.Add(container.NewStack(background, header3))
 
 	return productGrid
 

@@ -31,12 +31,15 @@ func CreateReportButton(g *services.GUIService, w fyne.Window) fyne.CanvasObject
 	})
 }
 
-func CreateSaveButton(g *services.GUIService, w fyne.Window, productsList *fyne.Container) (fyne.CanvasObject, *widget.Entry, *widget.Entry, *widget.Label) {
+func CreateSaveButton(g *services.GUIService, w fyne.Window, productsList *fyne.Container) (fyne.CanvasObject, *widget.Entry, *widget.Entry, *widget.Entry, *widget.Label) {
 	nameEntry := widget.NewEntry()
 	nameEntry.SetPlaceHolder("Produto")
 
 	valueEntry := widget.NewEntry()
 	valueEntry.SetPlaceHolder("Valor")
+
+	dataEntry := widget.NewEntry()
+	dataEntry.SetPlaceHolder("Mes/Ano")
 
 	statusLabel := widget.NewLabel("")
 
@@ -44,6 +47,7 @@ func CreateSaveButton(g *services.GUIService, w fyne.Window, productsList *fyne.
 
 		name := nameEntry.Text
 		valueStr := valueEntry.Text
+		data := dataEntry.Text
 
 		value, err := strconv.ParseFloat(valueStr, 64)
 		if err != nil {
@@ -51,7 +55,7 @@ func CreateSaveButton(g *services.GUIService, w fyne.Window, productsList *fyne.
 			return
 		}
 
-		err = g.UserService.SaveProduct(name, value)
+		err = g.UserService.SaveProduct(name, data, value)
 		if err != nil {
 			statusLabel.SetText("Erro ao Inserir!")
 			return
@@ -62,5 +66,5 @@ func CreateSaveButton(g *services.GUIService, w fyne.Window, productsList *fyne.
 		valueEntry.SetText("")
 
 		g.RefreshUserList(productsList)
-	}), nameEntry, valueEntry, statusLabel
+	}), nameEntry, valueEntry, dataEntry, statusLabel
 }

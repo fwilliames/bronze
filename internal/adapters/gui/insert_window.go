@@ -10,7 +10,7 @@ import (
 func NewInsertWindow(g *services.GUIService, w fyne.Window) fyne.CanvasObject {
 	productsList := container.NewVBox()
 
-	saveButton, nameEntry, valueEntry, statusLabel := CreateSaveButton(g, w, productsList)
+	saveButton, nameEntry, valueEntry, dataEntry, statusLabel := CreateSaveButton(g, w, productsList)
 	listButton := CreateListButton(g, w)
 	reportButton := CreateReportButton(g, w)
 
@@ -19,6 +19,7 @@ func NewInsertWindow(g *services.GUIService, w fyne.Window) fyne.CanvasObject {
 	return container.NewVBox(
 		nameEntry,
 		valueEntry,
+		dataEntry,
 		saveButton,
 		listButton,
 		reportButton,
