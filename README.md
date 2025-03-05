@@ -10,8 +10,9 @@ SuperMarket Tracker é um aplicativo desenvolvido em Go com interface em Fyne, q
 - **Bibliotecas externas:** `gofpdf` para a geração de relatórios em PDF
 
 ### Como buildar:
-1. Na pasta raiz do projeto usar o comando `make setup` para criar o binário do projeto
-2. usar o comando `make release` para gerar o instalador `SuperMarketSetup.exe`. Obs: é necessário ter o wine e o inno setup instalados
+1. Na pasta raiz do projeto usar o comando `make build` para criar o binário do projeto (para Windows SO).
+2. Usar o comando `make setup` para criar o instalador do projeto.
+3. usar o comando `make release` para buildar e gerar o instalador `SuperMarketSetup.exe`. Obs: é necessário ter o wine e o inno setup instalados
 
 ## Instalação e Configuração
 
