@@ -15,6 +15,11 @@ import (
 // GUIService fornece funcionalidades para manipulação da interface gráfica
 type GUIService struct {
 	UserService *UserService
+	Filter      Filter
+}
+
+type Filter struct {
+	Data string
 }
 
 // NewGUIService cria uma instância do serviço de GUI
