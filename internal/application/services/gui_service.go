@@ -80,3 +80,26 @@ func createLabel(labelText string) *fyne.Container {
 
 	return container.NewStack(background, Label)
 }
+
+func (g *GUIService) ListProductsByFilter(listContainer *fyne.Container, filter string) {
+	listContainer.Objects = nil
+
+	productGrid := createListToShow()
+
+	products, err := g.UserService.GetProductsByFilter(filter)
+	if err != nil {
+		listContainer.Add(widget.NewLabel("Erro ao carregar Produtos"))
+		listContainer.Refresh() // Atualiza a exibição
+		return
+	}
+
+	for _, product := range products {
+		productGrid.Add(createLabel(product.Name))
+		productGrid.Add(createLabel(fmt.Sprintf("%.2f", product.Value)))
+		productGrid.Add(createLabel(product.Data))
+
+	}
+
+	listContainer.Add(productGrid)
+	listContainer.Refresh()
+}
