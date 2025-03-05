@@ -4,6 +4,7 @@ import (
 	"bronze/internal/application/usecases"
 	"bronze/internal/domain"
 	"fmt"
+	"runtime"
 
 	"github.com/jung-kurt/gofpdf"
 )
@@ -33,39 +34,33 @@ func (s *UserService) GetProducts() ([]domain.Product, error) {
 }
 
 func (s *UserService) GenerateReport() error {
-
+	println("Generate Report")
 	products, err := s.GetProducts()
 	if err != nil {
 		return err
 	}
 
-	fileName := "reports/report"
-	// Cria uma nova instância de PDF
+	var fileName string
+
+	if runtime.GOOS == "windows" {
+		fileName = "reports/report.pdf"
+	} else {
+		fileName = "./temp/report.pdf"
+	}
+
 	pdf := gofpdf.New("P", "mm", "A4", "")
-
-	// Adiciona uma página ao PDF
 	pdf.AddPage()
-
-	// Define fonte para o título
 	pdf.SetFont("Arial", "B", 16)
-
-	// Adiciona um título
 	pdf.Cell(200, 10, "Lista de Produtos")
-
-	// Pula uma linha
 	pdf.Ln(20)
-
-	// Define a fonte para o corpo do texto
 	pdf.SetFont("Arial", "", 12)
 
-	// Adiciona os produtos na lista
 	for _, product := range products {
 		pdf.Cell(100, 10, fmt.Sprintf("Produto: %s", product.Name))
 		pdf.Cell(0, 10, fmt.Sprintf("Valor: %.2f", product.Value))
-		pdf.Ln(10) // Pula uma linha
+		pdf.Ln(10)
 	}
 
-	// Salva o arquivo PDF
 	err = pdf.OutputFileAndClose(fileName)
 	if err != nil {
 		return fmt.Errorf("erro ao criar o PDF: %v", err)
