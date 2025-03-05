@@ -10,7 +10,7 @@ SolidCompression=yes
 
 [Files]
 Source: "superMarket.exe"; DestDir: "{app}"
-Source: "../users.db"; DestDir: "{app}"
+Source: "../products.db"; DestDir: "{app}"
 
 [Dirs]
 Name: "{app}\reports"; Permissions: everyone-full
