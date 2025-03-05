@@ -14,8 +14,6 @@ func NewInsertWindow(g *services.GUIService, w fyne.Window) fyne.CanvasObject {
 	listButton := CreateListButton(g, w)
 	reportButton := CreateReportButton(g, w)
 
-	g.RefreshUserList(productsList)
-
 	return container.NewVBox(
 		nameEntry,
 		valueEntry,
