@@ -76,3 +76,22 @@ func (r *SQLiteRepository) GetAllProducts() ([]domain.Product, error) {
 
 	return products, nil
 }
+
+func (r *SQLiteRepository) GetUniqueDates() ([]string, error) {
+	rows, err := r.db.Query("SELECT DISTINCT data FROM products ORDER BY data DESC")
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var datas []string
+	for rows.Next() {
+		var data string
+		if err := rows.Scan(&data); err != nil {
+			return nil, err
+		}
+		datas = append(datas, data)
+	}
+
+	return datas, nil
+}
