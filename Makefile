@@ -1,5 +1,5 @@
 BUILD_DIR=build
-BINARY_NAME=cadastro.exe
+BINARY_NAME=superMarket.exe
 SOURCE=./cmd/main.go
 INNOSETUP=wine 'C:/Program Files (x86)/Inno Setup 6/ISCC.exe'
 SETUP_FILE=setup.iss
@@ -10,7 +10,7 @@ CC=CC=x86_64-w64-mingw32-gcc
 CXX= CXX=x86_64-w64-mingw32-g++
 FLAGS=-ldflags
 WINDOWSGUI="-H windowsgui"
-RELEASE_NAME=CadastroSetup.exe
+RELEASE_NAME=SuperMarketSetup.exe
 
 # Regra para compilar o código para Windows
 build: FORCE
@@ -19,7 +19,7 @@ build: FORCE
 
 # Regra para criar o instalador (Apenas se tiver o Innosteup e wine instalados)
 setup: 
-	$(INNOSETUP) $(SETUP_FILE)
+	$(INNOSETUP) build/$(SETUP_FILE)
 
 # Regra para compilar o binário e gerar o instalador
 release: build setup
