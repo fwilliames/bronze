@@ -30,7 +30,7 @@ func CreateButtonToReportWindow(g *services.GUIService, w fyne.Window) fyne.Canv
 func CreateReportButton(g *services.GUIService, w fyne.Window) fyne.CanvasObject {
 	statusLabel := widget.NewLabel("")
 	return widget.NewButton("Gerar Relatorio", func() {
-		err := g.UserService.GenerateReport(g.Filter.Data)
+		err := g.UserService.GenerateReport(g.Filters)
 		if err != nil {
 			statusLabel.SetText(err.Error())
 			return
@@ -62,7 +62,7 @@ func CreateSaveButton(g *services.GUIService, w fyne.Window, productsList *fyne.
 			return
 		}
 
-		err = g.UserService.SaveProduct(name, data, value)
+		err = g.UserService.SaveProduct(name, data, g.Filters.Market, value)
 		if err != nil {
 			statusLabel.SetText("Erro ao Inserir!")
 			return
@@ -105,13 +105,51 @@ func CreateSelectFilter(g *services.GUIService, w fyne.Window, field string) *wi
 			datas = []string{"Nenhuma data encontrada"}
 		}
 		items = datas
+		selectWidget := widget.NewSelect(items, func(selected string) {
+			g.Filters.Data = selected
+		})
+
+		selectWidget.PlaceHolder = "Selecione um item"
+
+		return selectWidget
+
+	case "market":
+		markets, err := g.UserService.GetMarkets()
+		if err != nil {
+			log.Println("Erro ao recuperar Markets:", err)
+			markets = []string{"Nenhuma data encontrada"}
+		}
+		items = markets
+		selectWidget := widget.NewSelect(items, func(selected string) {
+			g.Filters.Market = selected
+		})
+
+		selectWidget.PlaceHolder = "Selecione um item"
+
+		return selectWidget
 	}
+	return nil
+}
 
-	selectWidget := widget.NewSelect(items, func(selected string) {
-		g.Filter.Data = selected
-	})
+func CreateSaveMarketButton(g *services.GUIService, w fyne.Window, marketList *fyne.Container) (fyne.CanvasObject, *widget.Entry, *widget.Label) {
 
-	selectWidget.PlaceHolder = "Selecione um item"
+	marketEntry := widget.NewEntry()
+	marketEntry.SetPlaceHolder("Mercado")
 
-	return selectWidget
+	statusLabel := widget.NewLabel("")
+
+	return widget.NewButton("Salvar Mercado", func() {
+
+		err := g.UserService.SaveMarket(marketEntry.Text)
+		if err != nil {
+			statusLabel.SetText("Erro ao Inserir!")
+			return
+		}
+
+		statusLabel.SetText("Inserido com sucesso!")
+		marketEntry.SetText("")
+		marketEntry.SetPlaceHolder("Mercado")
+
+		g.ListProductsByFilter(marketList, "SuperMercados")
+	}), marketEntry, statusLabel
 }
