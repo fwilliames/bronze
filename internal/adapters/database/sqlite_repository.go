@@ -39,17 +39,40 @@ func NewSQLiteRepository() (usecases.UserRepository, error) {
 		return nil, err
 	}
 
-	_, err = db.Exec("CREATE TABLE IF NOT EXISTS products (id INTEGER PRIMARY KEY, name TEXT, data TEXT, value FLOAT)")
-	if err != nil {
-		return nil, err
+	// Criação das tabelas
+	statements := []string{
+		`CREATE TABLE IF NOT EXISTS products (
+		id INTEGER PRIMARY KEY, 
+		name TEXT, 
+		data TEXT, 
+		value FLOAT,
+		market TEXT
+	)`,
+		`CREATE TABLE IF NOT EXISTS markets (
+		id INTEGER PRIMARY KEY, 
+		name TEXT UNIQUE
+	)`,
+	}
+
+	// Executa cada comando de criação de tabela
+	for _, stmt := range statements {
+		if _, err := db.Exec(stmt); err != nil {
+			db.Close() // Fecha a conexão se houver erro
+			return nil, err
+		}
 	}
 
 	return &SQLiteRepository{db: db}, nil
 }
 
 // SaveUser insere um usuário no banco
-func (r *SQLiteRepository) SaveProduct(name, data string, value float64) error {
-	_, err := r.db.Exec("INSERT INTO products (name, data, value) VALUES (?, ?, ?)", name, data, value)
+func (r *SQLiteRepository) SaveProduct(name, data, market string, value float64) error {
+	_, err := r.db.Exec("INSERT INTO products (name, data, value, market) VALUES (?, ?, ?, ?)", name, data, value, market)
+	return err
+}
+
+func (r *SQLiteRepository) SaveMarket(name string) error {
+	_, err := r.db.Exec("INSERT INTO markets (name) VALUES (?)", name)
 	return err
 }
 
@@ -88,7 +111,7 @@ func (r *SQLiteRepository) GetAllProductsbyFilter(filter string) ([]domain.Produ
 	var products []domain.Product
 	for rows.Next() {
 		var product domain.Product
-		if err := rows.Scan(&product.ID, &product.Name, &product.Data, &product.Value); err != nil {
+		if err := rows.Scan(&product.ID, &product.Name, &product.Data, &product.Value, &product.Market); err != nil {
 			return nil, err
 		}
 		products = append(products, product)
@@ -99,6 +122,30 @@ func (r *SQLiteRepository) GetAllProductsbyFilter(filter string) ([]domain.Produ
 	}
 
 	return products, nil
+}
+
+// GetAllUsers retorna todos os usuários cadastrados no banco
+func (r *SQLiteRepository) GetAllMarkets() ([]string, error) {
+	rows, err := r.db.Query("SELECT DISTINCT name FROM markets ORDER BY name DESC")
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var markets []string
+	for rows.Next() {
+		var market string
+		if err := rows.Scan(&market); err != nil {
+			return nil, err
+		}
+		markets = append(markets, market)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return markets, nil
 }
 
 func (r *SQLiteRepository) GetUniqueDates() ([]string, error) {

@@ -15,11 +15,12 @@ import (
 // GUIService fornece funcionalidades para manipulação da interface gráfica
 type GUIService struct {
 	UserService *UserService
-	Filter      Filter
+	Filters     Filters
 }
 
-type Filter struct {
-	Data string
+type Filters struct {
+	Data   string
+	Market string
 }
 
 // NewGUIService cria uma instância do serviço de GUI
@@ -52,26 +53,22 @@ func (g *GUIService) RefreshUserList(listContainer *fyne.Container) {
 	listContainer.Refresh()
 }
 
-func createListToShow() *fyne.Container {
+func createListToShow(titles ...string) *fyne.Container {
 
+	headers := make([]*canvas.Text, len(titles))
 	background := canvas.NewRectangle(color.RGBA(colors.LavandaEscuro))
 
-	header1 := canvas.NewText("Nome", theme.ForegroundColor())
-	header1.TextStyle.Bold = true
-	header1.Color = colors.LavandaClaro
+	for i, title := range titles {
+		headers[i] = canvas.NewText(title, theme.ForegroundColor())
+		headers[i].TextStyle.Bold = true
+		headers[i].Color = colors.LavandaClaro
+	}
 
-	header2 := canvas.NewText("Preço", theme.ForegroundColor())
-	header2.TextStyle.Bold = true
-	header2.Color = colors.LavandaClaro
+	productGrid := container.NewGridWithColumns(len(titles))
+	for i, _ := range headers {
+		productGrid.Add(container.NewStack(background, headers[i]))
 
-	header3 := canvas.NewText("Mes/Ano", theme.ForegroundColor())
-	header3.TextStyle.Bold = true
-	header3.Color = colors.LavandaClaro
-
-	productGrid := container.NewGridWithColumns(3)
-	productGrid.Add(container.NewStack(background, header1))
-	productGrid.Add(container.NewStack(background, header2))
-	productGrid.Add(container.NewStack(background, header3))
+	}
 
 	return productGrid
 
@@ -89,7 +86,7 @@ func createLabel(labelText string) *fyne.Container {
 func (g *GUIService) ListProductsByFilter(listContainer *fyne.Container, filter string) {
 	listContainer.Objects = nil
 
-	productGrid := createListToShow()
+	productGrid := createListToShow("Nome", "Valor", "Mes/Ano", "Mercado")
 
 	products, err := g.UserService.GetProductsByFilter(filter)
 	if err != nil {
@@ -102,6 +99,28 @@ func (g *GUIService) ListProductsByFilter(listContainer *fyne.Container, filter 
 		productGrid.Add(createLabel(product.Name))
 		productGrid.Add(createLabel(fmt.Sprintf("%.2f", product.Value)))
 		productGrid.Add(createLabel(product.Data))
+		productGrid.Add(createLabel(product.Market))
+
+	}
+
+	listContainer.Add(productGrid)
+	listContainer.Refresh()
+}
+
+func (g *GUIService) ListMarkets(listContainer *fyne.Container, filter string) {
+	listContainer.Objects = nil
+
+	productGrid := createListToShow("Mercado")
+
+	markets, err := g.UserService.GetMarkets()
+	if err != nil {
+		listContainer.Add(widget.NewLabel("Erro ao carregar Produtos"))
+		listContainer.Refresh() // Atualiza a exibição
+		return
+	}
+
+	for _, market := range markets {
+		productGrid.Add(createLabel(market))
 
 	}
 
