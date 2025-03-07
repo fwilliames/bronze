@@ -12,7 +12,6 @@ UninstallIconFile=./uninstallicon.ico
 
 [Files]
 Source: "superMarket.exe"; DestDir: "{app}"
-Source: "../products.db"; DestDir: "{app}"
 Source: "../icon.ico"; DestDir: "{app}"
 
 [Dirs]
@@ -31,4 +30,4 @@ Filename: "{app}\superMarket.exe"; Description: "Executar o Guia SuperMarket"; F
 [UninstallDelete]
 Type: files; Name: "{userappdata}\SuperMarketTracker\products.db";
 Type: files; Name: "{userappdata}\SuperMarketTracker\reports\report";
-Type: files; Name: "{userappdata}SuperMarketTracker";
+Type: files; Name: "{userappdata}\SuperMarketTracker";
