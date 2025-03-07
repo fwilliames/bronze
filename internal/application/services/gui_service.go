@@ -12,7 +12,6 @@ import (
 	"fyne.io/fyne/v2/widget"
 )
 
-// GUIService fornece funcionalidades para manipulação da interface gráfica
 type GUIService struct {
 	UserService *UserService
 	Filters     Filters
@@ -23,12 +22,10 @@ type Filters struct {
 	Market string
 }
 
-// NewGUIService cria uma instância do serviço de GUI
 func NewGUIService(userService *UserService) *GUIService {
 	return &GUIService{UserService: userService}
 }
 
-// RefreshUserList atualiza a lista de usuários na interface gráfica
 func (g *GUIService) RefreshUserList(listContainer *fyne.Container) {
 
 	listContainer.Objects = nil
@@ -38,7 +35,7 @@ func (g *GUIService) RefreshUserList(listContainer *fyne.Container) {
 	products, err := g.UserService.GetProducts()
 	if err != nil {
 		listContainer.Add(widget.NewLabel("Erro ao carregar Produtos"))
-		listContainer.Refresh() // Atualiza a exibição
+		listContainer.Refresh()
 		return
 	}
 
