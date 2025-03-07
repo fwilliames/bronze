@@ -14,7 +14,7 @@ import (
 func getDBPath() string {
 	if runtime.GOOS == "windows" {
 		appData := os.Getenv("APPDATA")
-		return appData + "\\GuiaSuperMarket\\products.db"
+		return appData + "\\SuperMarketTracker\\products.db"
 	} else {
 		return "./temp/products.db"
 	}
@@ -31,7 +31,7 @@ func NewSQLiteRepository() (usecases.UserRepository, error) {
 
 	// Cria o diretório caso não exista
 	if runtime.GOOS == "windows" {
-		os.MkdirAll(os.Getenv("APPDATA")+"\\GuiaSuperMarket", os.ModePerm)
+		os.MkdirAll(os.Getenv("APPDATA")+"\\SuperMarketTracker", os.ModePerm)
 	}
 
 	db, err := sql.Open("sqlite3", dbPath)
