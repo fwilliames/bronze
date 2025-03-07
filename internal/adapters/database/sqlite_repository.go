@@ -10,7 +10,6 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 )
 
-// Retorna o caminho do banco no APPDATA
 func getDBPath() string {
 	if runtime.GOOS == "windows" {
 		appData := os.Getenv("APPDATA")
@@ -24,12 +23,10 @@ type SQLiteRepository struct {
 	db *sql.DB
 }
 
-// NewSQLiteRepository cria a conexão e inicializa o banco
 func NewSQLiteRepository() (usecases.UserRepository, error) {
 
 	dbPath := getDBPath()
 
-	// Cria o diretório caso não exista
 	if runtime.GOOS == "windows" {
 		os.MkdirAll(os.Getenv("APPDATA")+"\\SuperMarketTracker", os.ModePerm)
 	}
@@ -39,7 +36,6 @@ func NewSQLiteRepository() (usecases.UserRepository, error) {
 		return nil, err
 	}
 
-	// Criação das tabelas
 	statements := []string{
 		`CREATE TABLE IF NOT EXISTS products (
 		id INTEGER PRIMARY KEY, 
@@ -54,10 +50,9 @@ func NewSQLiteRepository() (usecases.UserRepository, error) {
 	)`,
 	}
 
-	// Executa cada comando de criação de tabela
 	for _, stmt := range statements {
 		if _, err := db.Exec(stmt); err != nil {
-			db.Close() // Fecha a conexão se houver erro
+			db.Close()
 			return nil, err
 		}
 	}
@@ -65,7 +60,6 @@ func NewSQLiteRepository() (usecases.UserRepository, error) {
 	return &SQLiteRepository{db: db}, nil
 }
 
-// SaveUser insere um usuário no banco
 func (r *SQLiteRepository) SaveProduct(name, data, market string, value float64) error {
 	_, err := r.db.Exec("INSERT INTO products (name, data, value, market) VALUES (?, ?, ?, ?)", name, data, value, market)
 	return err
@@ -76,7 +70,6 @@ func (r *SQLiteRepository) SaveMarket(name string) error {
 	return err
 }
 
-// GetAllUsers retorna todos os usuários cadastrados no banco
 func (r *SQLiteRepository) GetAllProducts() ([]domain.Product, error) {
 	rows, err := r.db.Query("SELECT id, name, data, value FROM products")
 	if err != nil {
@@ -100,7 +93,6 @@ func (r *SQLiteRepository) GetAllProducts() ([]domain.Product, error) {
 	return products, nil
 }
 
-// GetAllUsers retorna todos os usuários cadastrados no banco
 func (r *SQLiteRepository) GetAllProductsbyFilter(filter string) ([]domain.Product, error) {
 	rows, err := r.db.Query("SELECT * FROM products WHERE data = ?", filter)
 	if err != nil {
@@ -124,7 +116,6 @@ func (r *SQLiteRepository) GetAllProductsbyFilter(filter string) ([]domain.Produ
 	return products, nil
 }
 
-// GetAllUsers retorna todos os usuários cadastrados no banco
 func (r *SQLiteRepository) GetAllMarkets() ([]string, error) {
 	rows, err := r.db.Query("SELECT DISTINCT name FROM markets ORDER BY name DESC")
 	if err != nil {

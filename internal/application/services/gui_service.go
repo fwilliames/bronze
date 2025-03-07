@@ -83,19 +83,18 @@ func createLabel(labelText string) *fyne.Container {
 func (g *GUIService) ListProductsByFilter(listContainer *fyne.Container, filter string) {
 	listContainer.Objects = nil
 
-	productGrid := createListToShow("Nome", "Valor", "Mes/Ano", "Mercado")
+	productGrid := createListToShow("Nome", "Valor", "Mercado")
 
 	products, err := g.UserService.GetProductsByFilter(filter)
 	if err != nil {
 		listContainer.Add(widget.NewLabel("Erro ao carregar Produtos"))
-		listContainer.Refresh() // Atualiza a exibição
+		listContainer.Refresh()
 		return
 	}
 
 	for _, product := range products {
 		productGrid.Add(createLabel(product.Name))
 		productGrid.Add(createLabel(fmt.Sprintf("%.2f", product.Value)))
-		productGrid.Add(createLabel(product.Data))
 		productGrid.Add(createLabel(product.Market))
 
 	}
@@ -112,7 +111,7 @@ func (g *GUIService) ListMarkets(listContainer *fyne.Container, filter string) {
 	markets, err := g.UserService.GetMarkets()
 	if err != nil {
 		listContainer.Add(widget.NewLabel("Erro ao carregar Produtos"))
-		listContainer.Refresh() // Atualiza a exibição
+		listContainer.Refresh()
 		return
 	}
 

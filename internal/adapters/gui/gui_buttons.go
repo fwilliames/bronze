@@ -27,6 +27,12 @@ func CreateButtonToReportWindow(g *services.GUIService, w fyne.Window) fyne.Canv
 	})
 }
 
+func CreateButtonToMainWindow(g *services.GUIService, w fyne.Window) fyne.CanvasObject {
+	return widget.NewButton("Inicio", func() {
+		w.SetContent(NewMainWindow(g, w))
+	})
+}
+
 func CreateReportButton(g *services.GUIService, w fyne.Window) fyne.CanvasObject {
 	statusLabel := widget.NewLabel("")
 	return widget.NewButton("Gerar Relatorio", func() {
@@ -109,7 +115,7 @@ func CreateSelectFilter(g *services.GUIService, w fyne.Window, field string) *wi
 			g.Filters.Data = selected
 		})
 
-		selectWidget.PlaceHolder = "Selecione um item"
+		selectWidget.PlaceHolder = "Selecione uma Data"
 
 		return selectWidget
 
@@ -124,7 +130,7 @@ func CreateSelectFilter(g *services.GUIService, w fyne.Window, field string) *wi
 			g.Filters.Market = selected
 		})
 
-		selectWidget.PlaceHolder = "Selecione um item"
+		selectWidget.PlaceHolder = "Selecione um Mercado"
 
 		return selectWidget
 	}

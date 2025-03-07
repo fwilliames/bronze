@@ -16,12 +16,11 @@ func NewMainWindow(guiService *services.GUIService, w fyne.Window) fyne.CanvasOb
 	buttonToReportWindow := CreateButtonToReportWindow(guiService, w)
 	buttonSaveMarket, marketEntry, statusLabel := CreateSaveMarketButton(guiService, w, marketList)
 
+	vbox := container.NewVBox(marketEntry, buttonSaveMarket, statusLabel)
+	hbox := container.NewHBox(buttonToInsertWindow, buttonToListWindow, buttonToReportWindow)
+
 	return container.NewVBox(
-		statusLabel,
-		buttonToInsertWindow,
-		buttonToListWindow,
-		buttonToReportWindow,
-		marketEntry,
-		buttonSaveMarket,
+		vbox,
+		hbox,
 	)
 }

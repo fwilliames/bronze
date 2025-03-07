@@ -8,18 +8,15 @@ import (
 )
 
 func main() {
-	// Inicializa o repositório (banco de dados)
+
 	repo, err := database.NewSQLiteRepository()
 	if err != nil {
-		log.Println("Erro ao iniciar banco:", err) // Apenas um log, sem travar
+		log.Println("Erro ao iniciar banco:", err)
 		return
 	}
 
-	// Inicializa o serviço de usuários
 	userService := services.NewUserService(repo)
-
 	guiService := services.NewGUIService(userService)
 
-	// Inicializa a interface gráfica
 	gui.StartApp(guiService)
 }

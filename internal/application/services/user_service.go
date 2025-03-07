@@ -4,6 +4,7 @@ import (
 	"bronze/internal/application/usecases"
 	"bronze/internal/domain"
 	"fmt"
+	"log"
 	"runtime"
 
 	"github.com/jung-kurt/gofpdf"
@@ -50,8 +51,6 @@ func (s *UserService) GetProductsByFilter(filter string) ([]domain.Product, erro
 }
 
 func (s *UserService) GenerateReport(filters Filters) error {
-	println("Generate Report")
-	println(filters.Data)
 
 	productsByData, err := s.GetProductsByFilter(filters.Data)
 	if err != nil {
@@ -66,6 +65,17 @@ func (s *UserService) GenerateReport(filters Filters) error {
 		}
 	}
 
+	createPDFDocument(filters.Market, products)
+
+	return nil
+}
+
+func (s *UserService) GetUniqueDates() ([]string, error) {
+	return s.repo.GetUniqueDates()
+}
+
+func createPDFDocument(market string, products []domain.Product) {
+
 	var fileName string
 
 	if runtime.GOOS == "windows" {
@@ -77,20 +87,17 @@ func (s *UserService) GenerateReport(filters Filters) error {
 	pdf := gofpdf.New("P", "mm", "A4", "")
 	pdf.AddPage()
 
-	// Título principal
 	pdf.SetFont("Arial", "B", 16)
 	pdf.Cell(100, 10, "Lista de Produtos")
-	pdf.Cell(100, 10, filters.Market)
-	pdf.Ln(20) // Pula uma linha
+	pdf.Cell(100, 10, market)
+	pdf.Ln(20)
 
-	// Títulos das colunas
 	pdf.SetFont("Arial", "B", 12)
 	pdf.Cell(66, 10, "Produto")
 	pdf.Cell(66, 10, "Valor")
 	pdf.Cell(66, 10, "Mes/Ano")
-	pdf.Ln(10) // Pula uma linha
+	pdf.Ln(10)
 
-	// Definir a fonte para os dados
 	pdf.SetFont("Arial", "", 12)
 
 	for _, product := range products {
@@ -100,14 +107,9 @@ func (s *UserService) GenerateReport(filters Filters) error {
 		pdf.Ln(10)
 	}
 
-	err = pdf.OutputFileAndClose(fileName)
+	err := pdf.OutputFileAndClose(fileName)
 	if err != nil {
-		return fmt.Errorf("erro ao criar o PDF: %v", err)
+		log.Printf("erro ao criar o PDF: %v", err)
 	}
 
-	return nil
-}
-
-func (s *UserService) GetUniqueDates() ([]string, error) {
-	return s.repo.GetUniqueDates()
 }
