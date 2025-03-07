@@ -3,6 +3,7 @@ package services
 import (
 	"bronze/internal/application/usecases"
 	"bronze/internal/domain"
+	"errors"
 	"fmt"
 	"log"
 	"runtime"
@@ -23,6 +24,10 @@ func (s *UserService) SaveProduct(name, data, market string, value float64) erro
 }
 
 func (s *UserService) SaveMarket(name string) error {
+	if name == "" {
+		err := errors.New("")
+		return err
+	}
 	return s.repo.SaveMarket(name)
 }
 
