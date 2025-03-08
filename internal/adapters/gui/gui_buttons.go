@@ -2,8 +2,10 @@ package gui
 
 import (
 	"bronze/internal/application/services"
+	"bronze/internal/config/utils"
 	"log"
 	"strconv"
+	"strings"
 
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/widget"
@@ -51,6 +53,9 @@ func CreateSaveButton(g *services.GUIService, w fyne.Window, productsList *fyne.
 	valueEntry := widget.NewEntry()
 	valueEntry.SetPlaceHolder("Valor")
 
+	quantityEntry := widget.NewEntry()
+	quantityEntry.SetPlaceHolder("Quantidade")
+
 	dataEntry := widget.NewEntry()
 	dataEntry.SetPlaceHolder("Mes/Ano")
 
@@ -60,17 +65,37 @@ func CreateSaveButton(g *services.GUIService, w fyne.Window, productsList *fyne.
 
 		name := nameEntry.Text
 		valueStr := valueEntry.Text
-		data := dataEntry.Text
+		quantityStr := quantityEntry.Text
 
+		valueStr = strings.TrimSpace(valueStr) // Remove espaços extras
+		if valueStr == "" {
+			statusLabel.SetText("O valor não pode estar vazio!")
+			return
+		}
 		value, err := strconv.ParseFloat(valueStr, 64)
 		if err != nil {
 			statusLabel.SetText("Valor invalido!")
 			return
 		}
 
-		err = g.UserService.SaveProduct(name, data, g.Filters.Market, value)
+		quantityStr = strings.TrimSpace(quantityStr) // Remove espaços extras
+
+		if quantityStr == "" {
+			statusLabel.SetText("O valor não pode estar vazio!")
+			return
+		}
+
+		quantity, err := strconv.ParseInt(quantityStr, 10, 64)
 		if err != nil {
-			statusLabel.SetText("Erro ao Inserir!")
+			statusLabel.SetText("Valor inválido! Digite um número inteiro.")
+			return
+		}
+
+		totalValue := utils.Prod(value, quantity)
+
+		err = g.UserService.SaveProduct(name, g.Filters.Data, g.Filters.Market, value, totalValue, quantity)
+		if err != nil {
+			statusLabel.SetText(err.Error())
 			return
 		}
 
@@ -78,12 +103,12 @@ func CreateSaveButton(g *services.GUIService, w fyne.Window, productsList *fyne.
 		nameEntry.SetText("")
 		valueEntry.SetText("")
 
-		g.ListProductsByFilter(productsList, data)
-	}), nameEntry, valueEntry, dataEntry, statusLabel
+		g.ListProductsByFilter(productsList, g.Filters.Data)
+	}), nameEntry, valueEntry, quantityEntry, statusLabel
 }
 
 func CreateDataSelectFilter(g *services.GUIService, w fyne.Window, productsList *fyne.Container) *widget.Select {
-	dates, err := g.UserService.GetUniqueDates()
+	dates, err := g.UserService.GetDates()
 	if err != nil {
 		log.Println("Erro ao recuperar datas:", err)
 		dates = []string{"Nenhuma data encontrada"}
@@ -100,18 +125,16 @@ func CreateDataSelectFilter(g *services.GUIService, w fyne.Window, productsList 
 
 func CreateSelectFilter(g *services.GUIService, w fyne.Window, field string) *widget.Select {
 
-	var items []string
-
 	switch field {
 
 	case "data":
-		datas, err := g.UserService.GetUniqueDates()
+
+		datas, err := g.UserService.GetDates()
 		if err != nil {
 			log.Println("Erro ao recuperar datas:", err)
-			datas = []string{"Nenhuma data encontrada"}
 		}
-		items = datas
-		selectWidget := widget.NewSelect(items, func(selected string) {
+
+		selectWidget := widget.NewSelect(datas, func(selected string) {
 			g.Filters.Data = selected
 		})
 
@@ -125,8 +148,8 @@ func CreateSelectFilter(g *services.GUIService, w fyne.Window, field string) *wi
 			log.Println("Erro ao recuperar Markets:", err)
 			markets = []string{"Nenhuma data encontrada"}
 		}
-		items = markets
-		selectWidget := widget.NewSelect(items, func(selected string) {
+
+		selectWidget := widget.NewSelect(markets, func(selected string) {
 			g.Filters.Market = selected
 		})
 
@@ -158,4 +181,26 @@ func CreateSaveMarketButton(g *services.GUIService, w fyne.Window, marketList *f
 
 		g.ListProductsByFilter(marketList, "SuperMercados")
 	}), marketEntry, statusLabel
+}
+
+func CreateSaveDateButton(g *services.GUIService, w fyne.Window) (fyne.CanvasObject, *widget.Entry, *widget.Label) {
+
+	dataEntry := widget.NewEntry()
+	dataEntry.SetPlaceHolder("Data")
+
+	statusLabel := widget.NewLabel("")
+
+	return widget.NewButton("Salvar Mes/Ano", func() {
+
+		err := g.UserService.SaveData(dataEntry.Text)
+		if err != nil {
+			statusLabel.SetText("Erro ao Inserir!")
+			return
+		}
+
+		statusLabel.SetText("Inserido com sucesso!")
+		dataEntry.SetText("")
+		dataEntry.SetPlaceHolder("Mercado")
+
+	}), dataEntry, statusLabel
 }

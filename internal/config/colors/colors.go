@@ -1,4 +1,4 @@
-package config
+package colors
 
 import "image/color"
 
