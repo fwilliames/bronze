@@ -2,9 +2,11 @@
 package domain
 
 type Product struct {
-	ID     int
-	Name   string
-	Data   string
-	Value  float64
-	Market string
+	ID         int
+	Name       string
+	Data       string
+	Value      float64
+	Market     string
+	Quantity   int
+	TotalValue float64
 }

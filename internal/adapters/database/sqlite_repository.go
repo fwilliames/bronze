@@ -42,11 +42,17 @@ func NewSQLiteRepository() (usecases.UserRepository, error) {
 		name TEXT, 
 		data TEXT, 
 		value FLOAT,
-		market TEXT
+		market TEXT,
+		quantity INT,
+		totalValue FLOAT
 	)`,
 		`CREATE TABLE IF NOT EXISTS markets (
 		id INTEGER PRIMARY KEY, 
 		name TEXT UNIQUE
+	)`,
+		`CREATE TABLE IF NOT EXISTS datas (
+		id INTEGER PRIMARY KEY, 
+		data TEXT UNIQUE
 	)`,
 	}
 
@@ -60,8 +66,8 @@ func NewSQLiteRepository() (usecases.UserRepository, error) {
 	return &SQLiteRepository{db: db}, nil
 }
 
-func (r *SQLiteRepository) SaveProduct(name, data, market string, value float64) error {
-	_, err := r.db.Exec("INSERT INTO products (name, data, value, market) VALUES (?, ?, ?, ?)", name, data, value, market)
+func (r *SQLiteRepository) SaveProduct(name, data, market string, value, totalValue float64, quantity int64) error {
+	_, err := r.db.Exec("INSERT INTO products (name, data, value, market, quantity, totalValue) VALUES (?, ?, ?, ?, ?, ?)", name, data, value, market, quantity, totalValue)
 	return err
 }
 
@@ -70,8 +76,13 @@ func (r *SQLiteRepository) SaveMarket(name string) error {
 	return err
 }
 
+func (r *SQLiteRepository) SaveData(data string) error {
+	_, err := r.db.Exec("INSERT INTO datas (data) VALUES (?)", data)
+	return err
+}
+
 func (r *SQLiteRepository) GetAllProducts() ([]domain.Product, error) {
-	rows, err := r.db.Query("SELECT id, name, data, value FROM products")
+	rows, err := r.db.Query("SELECT id, name, data, market, quantity, totalValue value FROM products")
 	if err != nil {
 		return nil, err
 	}
@@ -80,7 +91,7 @@ func (r *SQLiteRepository) GetAllProducts() ([]domain.Product, error) {
 	var products []domain.Product
 	for rows.Next() {
 		var product domain.Product
-		if err := rows.Scan(&product.ID, &product.Name, &product.Data, &product.Value); err != nil {
+		if err := rows.Scan(&product.ID, &product.Name, &product.Data, &product.Value, &product.Market, &product.Quantity, &product.TotalValue); err != nil {
 			return nil, err
 		}
 		products = append(products, product)
@@ -103,7 +114,7 @@ func (r *SQLiteRepository) GetAllProductsbyFilter(filter string) ([]domain.Produ
 	var products []domain.Product
 	for rows.Next() {
 		var product domain.Product
-		if err := rows.Scan(&product.ID, &product.Name, &product.Data, &product.Value, &product.Market); err != nil {
+		if err := rows.Scan(&product.ID, &product.Name, &product.Data, &product.Value, &product.Market, &product.Quantity, &product.TotalValue); err != nil {
 			return nil, err
 		}
 		products = append(products, product)
@@ -137,6 +148,29 @@ func (r *SQLiteRepository) GetAllMarkets() ([]string, error) {
 	}
 
 	return markets, nil
+}
+
+func (r *SQLiteRepository) GetAllDates() ([]domain.Data, error) {
+	rows, err := r.db.Query("SELECT DISTINCT * FROM datas ORDER BY data DESC")
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var datas []domain.Data
+	for rows.Next() {
+		var data domain.Data
+		if err := rows.Scan(&data.ID, &data.Name); err != nil {
+			return nil, err
+		}
+		datas = append(datas, data)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return datas, nil
 }
 
 func (r *SQLiteRepository) GetUniqueDates() ([]string, error) {

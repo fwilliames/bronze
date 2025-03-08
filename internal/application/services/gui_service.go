@@ -1,7 +1,9 @@
 package services
 
 import (
-	colors "bronze/internal/config/colors"
+	"bronze/internal/config/colors"
+	"bronze/internal/config/utils"
+	"bronze/internal/domain"
 	"fmt"
 	"image/color"
 
@@ -26,30 +28,6 @@ func NewGUIService(userService *UserService) *GUIService {
 	return &GUIService{UserService: userService}
 }
 
-func (g *GUIService) RefreshUserList(listContainer *fyne.Container) {
-
-	listContainer.Objects = nil
-
-	productGrid := createListToShow()
-
-	products, err := g.UserService.GetProducts()
-	if err != nil {
-		listContainer.Add(widget.NewLabel("Erro ao carregar Produtos"))
-		listContainer.Refresh()
-		return
-	}
-
-	for _, product := range products {
-		productGrid.Add(createLabel(product.Name))
-		productGrid.Add(createLabel(fmt.Sprintf("%.2f", product.Value)))
-		productGrid.Add(createLabel(product.Data))
-
-	}
-
-	listContainer.Add(productGrid)
-	listContainer.Refresh()
-}
-
 func createListToShow(titles ...string) *fyne.Container {
 
 	headers := make([]*canvas.Text, len(titles))
@@ -59,10 +37,11 @@ func createListToShow(titles ...string) *fyne.Container {
 		headers[i] = canvas.NewText(title, theme.ForegroundColor())
 		headers[i].TextStyle.Bold = true
 		headers[i].Color = colors.LavandaClaro
+		headers[i].Alignment = fyne.TextAlignCenter
 	}
 
 	productGrid := container.NewGridWithColumns(len(titles))
-	for i, _ := range headers {
+	for i := range headers {
 		productGrid.Add(container.NewStack(background, headers[i]))
 
 	}
@@ -76,14 +55,47 @@ func createLabel(labelText string) *fyne.Container {
 
 	Label := canvas.NewText(labelText, theme.ForegroundColor())
 	Label.Color = colors.RoxoSuave
+	Label.Alignment = fyne.TextAlignCenter
 
 	return container.NewStack(background, Label)
+}
+
+func createLineToList(list *fyne.Container, product domain.Product) {
+	list.Add(createLabel(product.Name))
+	list.Add(createLabel(fmt.Sprintf("%.2f", product.Value)))
+	list.Add(createLabel(fmt.Sprintf("%d", product.Quantity)))
+	list.Add(createLabel(fmt.Sprintf("%.2f", product.TotalValue)))
+	list.Add(createLabel(product.Market))
+}
+
+func createTotalLineToList(list *fyne.Container, products []domain.Product) {
+	var values = make([]float64, len(products))
+	for i, product := range products {
+		values[i] = product.TotalValue
+	}
+
+	totalValue := utils.Sum(values)
+
+	list.Add(createLabel("Total"))
+	list.Add(createLabel(""))
+	list.Add(createLabel(""))
+	list.Add(createLabel(""))
+	list.Add(createLabel(fmt.Sprintf("%.2f", totalValue)))
+}
+
+func fillListToShow(list *fyne.Container, products []domain.Product) {
+
+	for _, product := range products {
+		createLineToList(list, product)
+	}
+
+	createTotalLineToList(list, products)
 }
 
 func (g *GUIService) ListProductsByFilter(listContainer *fyne.Container, filter string) {
 	listContainer.Objects = nil
 
-	productGrid := createListToShow("Nome", "Valor", "Mercado")
+	productGrid := createListToShow("Nome", "Valor", "Quantidade", "Total", "Mercado")
 
 	products, err := g.UserService.GetProductsByFilter(filter)
 	if err != nil {
@@ -92,12 +104,7 @@ func (g *GUIService) ListProductsByFilter(listContainer *fyne.Container, filter 
 		return
 	}
 
-	for _, product := range products {
-		productGrid.Add(createLabel(product.Name))
-		productGrid.Add(createLabel(fmt.Sprintf("%.2f", product.Value)))
-		productGrid.Add(createLabel(product.Market))
-
-	}
+	fillListToShow(productGrid, products)
 
 	listContainer.Add(productGrid)
 	listContainer.Refresh()

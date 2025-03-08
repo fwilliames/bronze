@@ -15,9 +15,9 @@ func NewListWindow(g *services.GUIService, w fyne.Window) fyne.CanvasObject {
 	buttonToReportWindow := CreateButtonToReportWindow(g, w)
 	buttonToMainWindow := CreateButtonToMainWindow(g, w)
 
-	dataSelectFilter := CreateDataSelectFilter(g, w, productsList)
+	dataSelectFilterAndList := CreateDataSelectFilter(g, w, productsList)
 
-	vbox := container.NewVBox(dataSelectFilter, productsList)
+	vbox := container.NewVBox(dataSelectFilterAndList, productsList)
 	hbox := container.NewHBox(buttonToInsertWindow, buttonToReportWindow, buttonToMainWindow)
 
 	return container.NewVBox(

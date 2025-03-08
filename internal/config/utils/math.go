@@ -1,4 +1,4 @@
-package config
+package utils
 
 func Sum(values []float64) float64 {
 	var sum float64
@@ -10,6 +10,6 @@ func Sum(values []float64) float64 {
 	return sum
 }
 
-func Prod(value1, value2 float64) float64 {
-	return value1 * value2
+func Prod(value1 float64, value2 int64) float64 {
+	return value1 * float64(value2)
 }
